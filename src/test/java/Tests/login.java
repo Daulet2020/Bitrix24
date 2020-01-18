@@ -1,10 +1,12 @@
 package Tests;
 
 import Utility.WebDriverFactory;
+import com.github.javafaker.Faker;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -43,11 +45,26 @@ public class login {
 //            System.out.println("Actual titile " + expectedTitle);
 //        }
         Assert.assertEquals(actualTitle, expectedTitle);
-        Assert.assertEquals(driver.getTitle(), "por");
+        Assert.assertEquals(driver.getTitle(), "portal");
     }
 
     @Test
     public void inValidLogin() {
-        System.out.println("Invalid ");
+        WebElement username = driver.findElement(By.name("USER_LOGIN"));
+        Faker dommyData = new Faker();
+        String name = dommyData.name().firstName();
+        username.sendKeys(name);
+        driver.findElement(By.name("USER_PASSWORD")).sendKeys(dommyData.animal().name());
+        driver.findElement(By.className("login-btn")).click();
+        //verify the error message
+        String expectedMessage = "Incorrect login or password";
+        //    WebElement errorMessage = driver.findElement(By.className("errortext"));
+        String actualMessage = driver.findElement(By.className("errortext")).getText();
+        Assert.assertEquals(actualMessage, expectedMessage);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        driver.quit();
     }
 }
